@@ -24,13 +24,12 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         super(SimpleFirewallStudent, self).__init__(*args, **kwargs)
         # dpid(스위치 ID) 별 MAC 학습 테이블
         # 예: self.mac_to_port[dpid][mac] = port_no
+
+        # TODO: 차단할 IP 쌍을 정의할 것
         self.block_pairs = {
             ('10.0.0.1', '10.0.0.3'),  # h1 -> h3 통신 차단 정책
             ('10.0.0.3', '10.0.0.1'),  # h3 -> h1 통신 차단 정책 (양방향 차단을 위해 추가)
         }
-
-        # TODO: 차단할 IP 쌍을 정의할 것
-        self.block_pairs = set()
 
     def add_flow(self, datapath, priority, match, actions, buffer_id=None):
         """스위치에 flow entry를 추가하는 헬퍼 함수"""
@@ -150,7 +149,7 @@ class SimpleFirewallStudent(app_manager.RyuApp):
                 )
                 actions = [] 
                 self.add_flow(datapath, priority=20, match=match, actions=actions)
-                
+
                 return
 
         # ==========================
