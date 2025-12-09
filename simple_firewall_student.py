@@ -24,7 +24,10 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         super(SimpleFirewallStudent, self).__init__(*args, **kwargs)
         # dpid(스위치 ID) 별 MAC 학습 테이블
         # 예: self.mac_to_port[dpid][mac] = port_no
-        self.mac_to_port = {}
+        self.block_pairs = {
+            ('10.0.0.1', '10.0.0.3'),  # h1 -> h3 통신 차단 정책
+            ('10.0.0.3', '10.0.0.1'),  # h3 -> h1 통신 차단 정책 (양방향 차단을 위해 추가)
+        }
 
         # TODO: 차단할 IP 쌍을 정의할 것
         self.block_pairs = set()
@@ -135,6 +138,20 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         # --------------------------------
         # 여기에 코드 작성
         # --------------------------------
+        if ip4 and src_ip and dst_ip:
+
+            if (src_ip, dst_ip) in self.block_pairs:
+                self.logger.info("!! FIREWALL DROP POLICY APPLIED: %s -> %s" % (src_ip, dst_ip))
+                
+                match = parser.OFPMatch(
+                    eth_type=ether_types.ETH_TYPE_IP,
+                    ipv4_src=src_ip,
+                    ipv4_dst=dst_ip
+                )
+                actions = [] 
+                self.add_flow(datapath, priority=20, match=match, actions=actions)
+                
+                return
 
         # ==========================
         # 4) 기본 포워딩 (학습 스위치 동작)
