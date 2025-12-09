@@ -66,7 +66,7 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         match = parser.OFPMatch()
         actions = [parser.OFPActionOutput(ofproto.OFPP_CONTROLLER, ofproto.OFPCML_NO_BUFFER)]
         self.add_flow(datapath, 0, match, actions)
-        
+
     @set_ev_cls(ofp_event.EventOFPPacketIn, MAIN_DISPATCHER)
     def _packet_in_handler(self, ev):
         """
@@ -103,6 +103,7 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         # --------------------------------
         # 여기에 코드 작성
         # --------------------------------
+        self.mac_to_port[dpid][src] = in_port
 
         # ==========================
         # 2) IPv4 헤더 파싱
@@ -117,6 +118,9 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         #     src_ip = ...
         #     dst_ip = ...
         # --------------------------------
+        if ip4:
+            src_ip = ip4.src
+            dst_ip = ip4.dst
 
         # 디버깅용 로그 출력
         self.logger.info(
