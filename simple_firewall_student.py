@@ -24,6 +24,7 @@ class SimpleFirewallStudent(app_manager.RyuApp):
         super(SimpleFirewallStudent, self).__init__(*args, **kwargs)
         # dpid(스위치 ID) 별 MAC 학습 테이블
         # 예: self.mac_to_port[dpid][mac] = port_no
+        self.mac_to_port = {}
 
         # TODO: 차단할 IP 쌍을 정의할 것
         self.block_pairs = {
